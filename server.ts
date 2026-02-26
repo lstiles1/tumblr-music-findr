@@ -8,6 +8,38 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const isTransientNetworkError = (error: any) => {
+  const message = String(error?.message || "").toLowerCase();
+  const code = String(error?.code || "");
+  return (
+    code === "ECONNRESET" ||
+    code === "ETIMEDOUT" ||
+    code === "ECONNABORTED" ||
+    message.includes("socket hang up") ||
+    message.includes("timeout")
+  );
+};
+
+const axiosGetWithRetry = async <T = any>(url: string, config: any, retries = 2) => {
+  let lastError: unknown = null;
+
+  for (let attempt = 0; attempt <= retries; attempt += 1) {
+    try {
+      return await axios.get<T>(url, config);
+    } catch (error) {
+      lastError = error;
+      if (!isTransientNetworkError(error) || attempt === retries) {
+        throw error;
+      }
+      await sleep(500 * (attempt + 1));
+    }
+  }
+
+  throw lastError;
+};
+
 async function startServer() {
   const app = express();
   const PORT = 3000;
@@ -27,7 +59,7 @@ async function startServer() {
       // We'll try to fetch up to 100 posts to get more content including reblogs
       const fetchTracks = async (start = 0) => {
         const apiUrl = `https://${blogUrl}/api/read/json?type=audio&num=50&start=${start}`;
-        const response = await axios.get(apiUrl, {
+        const response = await axiosGetWithRetry(apiUrl, {
           headers: {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
           },
@@ -93,7 +125,7 @@ async function startServer() {
       
       // Fallback: Try RSS feed or HTML scraping
       try {
-        const htmlResponse = await axios.get(targetUrl, {
+        const htmlResponse = await axiosGetWithRetry(targetUrl, {
           headers: {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
           },
