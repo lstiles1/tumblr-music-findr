@@ -1,4 +1,4 @@
-import { ScrapeHttpError, scrapeTumblrAudio } from "../../lib/tumblrScraper";
+import { ScrapeHttpError, scrapeTumblrAudio } from "../_lib/tumblrScraper";
 
 export default async function handler(req: any, res: any) {
   if (req.method !== "GET") {
