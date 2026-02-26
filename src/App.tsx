@@ -154,8 +154,43 @@ export default function App() {
 
       setLoadingStage(`Scanning @${cleanUsername}...`);
       const apiUrl = `/api/scrape/${cleanUsername}${postPath ? `?path=${encodeURIComponent(postPath)}` : ""}`;
-      const response = await fetch(apiUrl);
-      const data = await response.json();
+      let data: any = null;
+      let lastError: unknown = null;
+
+      // Retry once to smooth over cold-start races when the service is just booting.
+      for (let attempt = 0; attempt < 2; attempt += 1) {
+        try {
+          const response = await fetch(apiUrl);
+          const contentType = response.headers.get("content-type") || "";
+
+          if (!response.ok) {
+            if (attempt === 0 && response.status >= 500) {
+              setLoadingStage("Waking up scraper service...");
+              await new Promise((resolve) => setTimeout(resolve, 700));
+              continue;
+            }
+            throw new Error(`Request failed with status ${response.status}`);
+          }
+
+          if (!contentType.includes("application/json")) {
+            throw new Error("Unexpected response format");
+          }
+
+          data = await response.json();
+          break;
+        } catch (err) {
+          lastError = err;
+          if (attempt === 0) {
+            setLoadingStage("Waking up scraper service...");
+            await new Promise((resolve) => setTimeout(resolve, 700));
+            continue;
+          }
+        }
+      }
+
+      if (!data) {
+        throw lastError || new Error("Unable to reach scraper service");
+      }
 
       if (data.error) {
         setError(data.error);
