@@ -523,17 +523,30 @@ function TrackCard({
                       postUrl={track.url}
                     />
                   ) : (
-                    <div className="p-8 bg-[#ffffff] rounded-xl border border-[#9099a6]/50 flex flex-col items-center justify-center text-center">
-                      <AlertCircle className="w-8 h-8 opacity-20 mb-2" />
-                      <p className="text-xs opacity-50">Direct embed not available for this track.</p>
-                      <a 
-                        href={track.url} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="mt-4 text-[10px] font-bold uppercase tracking-widest underline"
-                      >
-                        Listen on Tumblr
-                      </a>
+                    <div className="p-5 sm:p-6 bg-[#ffffff] rounded-xl border border-[#9099a6]/50 flex flex-col items-start text-left">
+                      <p className="text-base font-bold leading-tight wrap-break-word">
+                        {track.title || "Untitled Track"}
+                      </p>
+                      <p className="text-sm text-[#6f7b8b] mt-1 wrap-break-word">
+                        {track.artist || "Unknown Artist"}
+                      </p>
+                      <div className="mt-4 rounded-xl border border-[#9099a6]/55 bg-[#9099a6]/10 p-3 w-full">
+                        <div className="flex items-start gap-2">
+                          <AlertCircle className="w-4 h-4 mt-0.5 text-[#36465d]/80 shrink-0" />
+                          <div className="min-w-0">
+                            <p className="text-xs font-bold uppercase tracking-wider text-[#36465d]/80">Audio Unavailable</p>
+                            <p className="text-xs text-[#6f7b8b] mt-1">Direct embed not available for this track.</p>
+                            <a 
+                              href={track.url} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="mt-2 inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-[#36465d] underline underline-offset-2"
+                            >
+                              <ExternalLink className="w-3 h-3" /> Open Post
+                            </a>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -676,7 +689,7 @@ function InlineAudioPlayer({
 
       <div className="mb-4">
         <p className="text-base font-bold leading-tight wrap-break-word">{title}</p>
-        <p className="text-sm text-[#6f7b8b] truncate">{artist}</p>
+        <p className="text-sm text-[#6f7b8b] wrap-break-word">{artist}</p>
       </div>
 
       <div className="mb-5">
