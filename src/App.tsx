@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Search, Music, ExternalLink, Play, Pause, Disc, AlertCircle, Loader2, User, Share2, ArrowUpDown, Filter, X } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
+import { Analytics } from "@vercel/analytics/react";
 
 interface Track {
   id: string;
@@ -412,6 +413,7 @@ export default function App() {
         </AnimatePresence>
       </main>
 
+      <Analytics />
     </div>
   );
 }
