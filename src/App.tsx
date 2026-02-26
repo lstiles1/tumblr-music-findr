@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Search, Music, ExternalLink, Play, Pause, Disc, AlertCircle, Loader2, User, Share2, ArrowUpDown, Filter, X } from "lucide-react";
+import { Search, Music, ExternalLink, Play, Pause, Disc, AlertCircle, Loader2, User, ArrowUpDown, Filter, X } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { Analytics } from "@vercel/analytics/react";
 
@@ -430,6 +430,12 @@ function TrackCard({
   onToggleExpanded: () => void;
 }): React.JSX.Element {
   const resolvedAudioSource = resolveTrackAudioSource(track);
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!isExpanded || typeof window === "undefined" || window.innerWidth >= 768) return;
+    cardRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, [isExpanded]);
 
   const handleCardClick = (event: React.MouseEvent<HTMLDivElement>) => {
     const target = event.target as HTMLElement;
@@ -446,6 +452,7 @@ function TrackCard({
 
   return (
     <motion.div
+      ref={cardRef}
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.05 }}
@@ -456,21 +463,16 @@ function TrackCard({
       aria-expanded={isExpanded}
       className="group bg-[#ffffff] text-[#36465d] rounded-lg border border-[#9099a6]/45 shadow-sm hover:border-[#529ecc]/75 hover:shadow-md hover:-translate-y-px transition-all overflow-hidden cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#529ecc]/45"
     >
-      <div className="p-4 flex items-center gap-4">
-        <div className="w-12 h-12 bg-[#9099a6]/15 border border-[#9099a6]/35 rounded-lg flex items-center justify-center shrink-0 group-hover:bg-[#529ecc] group-hover:text-[#ffffff] transition-colors">
-          <Music className="w-5 h-5" />
+      <div className="p-3.5 sm:p-4 flex items-center gap-3 sm:gap-4">
+        <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[#9099a6]/15 border border-[#9099a6]/35 rounded-lg flex items-center justify-center shrink-0 group-hover:bg-[#529ecc] group-hover:text-[#ffffff] transition-colors">
+          <Music className="w-4.5 h-4.5 sm:w-5 sm:h-5" />
         </div>
         
         <div className="grow min-w-0">
           <div className="flex items-center gap-2 mb-0.5">
-            <h3 className="font-bold truncate leading-tight group-hover:text-[#529ecc] transition-colors">
+            <h3 className="font-bold leading-tight group-hover:text-[#529ecc] transition-colors overflow-hidden [display:-webkit-box] [-webkit-line-clamp:3] sm:[-webkit-line-clamp:2] [-webkit-box-orient:vertical] md:block md:truncate">
               {track.title || "Untitled Track"}
             </h3>
-            {track.isReblog && (
-              <span className="flex items-center gap-1 text-[9px] font-bold uppercase tracking-wider bg-[#9099a6]/25 px-1.5 py-0.5 rounded text-[#6f7b8b]">
-                <Share2 className="w-2 h-2" /> Reblog
-              </span>
-            )}
           </div>
           <p className="text-xs text-[#6f7b8b] truncate">
             {track.artist || "Unknown Artist"} {track.album ? `• ${track.album}` : ""}
@@ -482,19 +484,19 @@ function TrackCard({
           )}
         </div>
 
-        <div className="flex items-center gap-2 shrink-0 opacity-100 transition-opacity">
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0 opacity-100 transition-opacity">
           <a 
             href={track.url} 
             target="_blank" 
             rel="noopener noreferrer"
-            className="p-2 hover:bg-[#9099a6]/25 rounded-lg transition-colors"
+            className="hidden sm:inline-flex p-2 hover:bg-[#9099a6]/25 rounded-lg transition-colors"
             title="Open on Tumblr"
           >
             <ExternalLink className="w-4 h-4" />
           </a>
           <button 
             onClick={onToggleExpanded}
-            className="bg-[#529ecc] text-[#ffffff] px-4 py-1.5 rounded-md text-xs font-bold hover:bg-[#36465d] active:scale-95 transition-colors"
+            className="bg-[#529ecc] text-[#ffffff] px-3 sm:px-4 py-1.5 rounded-md text-xs font-bold hover:bg-[#36465d] active:scale-95 transition-colors"
           >
             {isExpanded ? "Close" : "Listen"}
           </button>
@@ -577,9 +579,9 @@ function TrackCard({
 
 function MetaItem({ label, value }: { label: string; value: string | number }) {
   return (
-    <div className="flex justify-between items-center gap-4">
+    <div className="flex flex-col items-start gap-1 md:flex-row md:items-center md:justify-between md:gap-4">
       <span className="text-[10px] font-bold uppercase tracking-wider opacity-30">{label}</span>
-      <span className="text-xs font-medium truncate max-w-[200px]">{value}</span>
+      <span className="text-xs font-medium w-full md:w-auto md:max-w-[200px] wrap-break-word">{value}</span>
     </div>
   );
 }
@@ -673,7 +675,7 @@ function InlineAudioPlayer({
       <audio ref={audioRef} src={src} preload="metadata" />
 
       <div className="mb-4">
-        <p className="text-base font-bold leading-tight truncate">{title}</p>
+        <p className="text-base font-bold leading-tight wrap-break-word">{title}</p>
         <p className="text-sm text-[#6f7b8b] truncate">{artist}</p>
       </div>
 
