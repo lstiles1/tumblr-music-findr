@@ -243,7 +243,7 @@ export default function App() {
             </div>
 
             <div className="w-full md:w-[420px] md:self-end">
-              <div className="relative group rounded-full bg-[#ffffff]/95 border border-[#9099a6]/45 p-1 shadow-md shadow-[#202a3a]/20">
+              <div className="relative group rounded-full bg-[#ffffff]/95 p-1 shadow-md shadow-[#202a3a]/20">
                 <input
                   ref={usernameInputRef}
                   type="text"
@@ -252,7 +252,7 @@ export default function App() {
                   onKeyDown={(e) => e.key === "Enter" && handleScrape()}
                   placeholder="Username or blog URL..."
                   aria-label="Tumblr username or blog URL"
-                  className="w-full bg-transparent text-[#36465d] border border-transparent focus:border-[#529ecc]/70 rounded-full py-3 pl-10 pr-24 transition-all outline-none text-[15px] font-medium placeholder:text-[#6f7b8b]"
+                  className="w-full bg-transparent text-[#36465d] border border-transparent rounded-full py-3 pl-10 pr-24 transition-all outline-none text-base font-medium placeholder:text-[#6f7b8b]"
                 />
                 <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-[#6f7b8b] opacity-80 group-focus-within:opacity-100 transition-opacity" />
                 <button
